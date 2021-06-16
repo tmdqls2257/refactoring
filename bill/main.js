@@ -6,7 +6,7 @@ function statement(invoice, plays){
   let result = `청구 내역 (고객명: ${invocie.cutomer})\n`;
   const format = new Intl.NumberFormat("en-US",{style: "currency", currency: "USD", minimumFractionDigits: 2}).format;
   for (let perf of invoice.performances){
-    const paly = play[perf.playID];
+    const play = plays[perf.playID];
     let thisAmount = 0;
 
     switch(play.type){
