@@ -5,14 +5,14 @@ function statement(invoice, plays){
   const format = new Intl.NumberFormat("en-US",{style: "currency", currency: "USD", minimumFractionDigits: 2}).format;
   for (let perf of invoice.performances){
     // const play = playFor(perf); 인라인된 변수는 제거
-    let thisAmount = amountFor(perf, playFor(perf));
+    let thisAmount = amountFor(perf);
     // 포인트를 적립한다.
     volumeCredits += Math.max(perf.audience - 30, 0);
     // 희슷 관객 5명마다 추가 포인트를 제공
-    if ("comedy" === playFor(perf).type) volumeCredits +=Math.floor(perf.audience / 5);
-    // play를 playFor로 변경한다.
+    if ("comedy" === playFor(aPerformance).type) volumeCredits +=Math.floor(perf.audience / 5);
+
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${format(thisAmount/100)} (${perf.audience}석)\n`;
+    result += `${playFor(aPerformance).name}: ${format(thisAmount/100)} (${perf.audience}석)\n`;
     totalAmount += thisAmount;
   }
   result +=`총액: ${format(totalAmount/100)}\n`;
@@ -24,9 +24,9 @@ function playFor(aPerformance){
   return plays[aPerformance.playID];
 }
 
-function amountFor(perf, play){// 값이 바뀌지 않는 변수는 매개변수로 전달
+function amountFor(perf){// 값이 바뀌지 않는 변수는 매개변수로 전달
   let thisAmount = 0;//변수를 초기화할 코드
-  switch(play.type){
+  switch(playFor(aPerformance).type){
     case "tragedy": //비극
       thisAmount = 40000;
       if (perf.audience > 30){
@@ -39,7 +39,7 @@ function amountFor(perf, play){// 값이 바뀌지 않는 변수는 매개변수
       }
       thisAmount += 300 * perf.audience;
       break;
-    default: throw new Error(`알 수 없는 장르: ${play.type}`);
+    default: throw new Error(`알 수 없는 장르: ${playFor(aPerformance).type}`);
   }
   return thisAmount;
   }
