@@ -1,9 +1,12 @@
-  
+  'use strict';
+
 function statement(invoice, plays){
-return renderPlainText(invoice, plays);
+  const statementData = {};
+  statementData.customer = invoice.customer;
+  return renderPlainText(statementData, invoice, plays);
 }
-function renderPlainText(invoice, plays){
-  let result = `청구 내역 (고객명: ${invocie.cutomer})\n`;
+function renderPlainText(data, invoice, plays){
+  let result = `청구 내역 (고객명: ${data.cutomer})\n`;
   for (let perf of invoice.performances){
 
     // 청구 내역을 출력한다.
