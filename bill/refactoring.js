@@ -1,78 +1,55 @@
-  'use strict';
+'use strict'
 
-function statement(invoice, plays){
-  const statementData = {};
-  statementData.customer = invoice.customer;
-  statementData.performances = invoice.performances.map(enrichPerformance);
-  return renderPlainText(statementData, plays);
-}
+function statement(invoice) {
+  let totalAmount = 0
+  let volumeCredits = 0
+  let result = `청구 내역 (고객명: ${invocie.cutomer})\n`
+  const format = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+  }).format
 
-function enrichPerformance(aPerformance){
-  const result = Object.assign({}, aPerformance);
-  result.play = playFor(result);
-  return result;
-}
-
-function renderPlainText(data, plays){
-  let result = `청구 내역 (고객명: ${data.cutomer})\n`;
-  for (let perf of data.performances){
+  for (let perf of invoice.performances) {
+    // 포인트를 적립한다.
+    volumeCredits += Math.max(perf.audience - 30, 0)
+    // 희극 관객 5명마다 추가 포인트를 제공
+    if ('comedy' === playFor(perf).type)
+      volumeCredits += Math.floor(perf.audience / 5)
 
     // 청구 내역을 출력한다.
-    result += `${playFor(perf).name}: ${USD(amountFor(aPerformance)/100)} (${perf.audience}석)\n`;
+    result += `${playFor(perf).name}: ${format(amountFor(perf) / 100)} (${
+      perf.audience
+    }석)\n`
+    totalAmount += amountFor(perf)
   }
-  result +=`총액: ${USD(appleSauce()/100)}\n`;
-  result +=`적립 포인트: ${totalVolumeCredits()}점\n`;
-  
-  function appleSauce(){
-    let totalAmount = 0;
-    for (let perf of data.performances){
-      totalAmount += amountFor(perf);
-    }
-    return totalAmount;
+  result += `총액: ${format(thisAmount / 100)}\n`
+  result += `적립 포인트: ${volumeCredits}점\n`
+  return result
+}
+function amountFor(aPerformance) {
+  // 값이 바뀌지 않는 변수는 매개 변수로 전달
+  let thisAmount = 0 // 변수를 초기화하는 코드
+  switch (playFor(aPerformance).type) {
+    case 'tragedy': // 비극
+      thisAmount = 4000
+      if (aPerformance.audience > 30) {
+        thisAmount += 1000 * (aPerformance.audience - 30)
+      }
+      break
+    case 'comedy': // 희극
+      thisAmount = 3000
+      if (aPerformance.audience > 20) {
+        thisAmount += 1500 * (aPerformance.audience - 20)
+      }
+      thisAmount += 300 * aPerformance.audience
+      break
+    default:
+      throw new Error(`알 수 없는 장르; ${playFor(aPerformance).type}`)
   }
-  
-  function totalVolumeCredits(){
-    let volumeCredits = 0;
-    for (let perf of data.performances){
-      volumeCredits += volumeCreditsFor(perf);
-    }
-    return volumeCredits;
-  }
-  
-  function USD(aNumber){
-    return new Intl.NumberFormat("en-US",{style: "currency", currency: "USD", minimumFractionDigits: 2}).format(aNumber);
-  }
-  
-  function volumeCreditsFor(aPerformance){
-    let result = 0;
-    // 포인트를 적립한다.
-    result += Math.max(aPerformance.audience - 30, 0);
-    // 희슷 관객 5명마다 추가 포인트를 제공
-    if ("comedy" === playFor(aPerformance).type) result +=Math.floor(aPerformance.audience / 5);
-  }
-  
-  function playFor(perf){
-    return plays[perf.playID];
-  }
-  
-  function amountFor(aPerformance){// 값이 바뀌지 않는 변수는 매개변수로 전달
-    let result = 0;//변수를 초기화할 코드
-    switch(playFor(perf).type){
-      case "tragedy": //비극
-        result = 40000;
-        if (aPerformance.audience > 30){
-          result +=1000 * (aPerformance.audience - 30);
-        }
-      case "comedy": //희극
-        result = 30000;
-        if (aPerformance.audience > 20){
-          result += 10000 + 500 * (aPerformance.audience - 20);
-        }
-        result += 300 * aPerformance.audience;
-        break;
-      default: throw new Error(`알 수 없는 장르: ${playFor(perf).type}`);
-    }
-    return result;
-    }
-  return result;
+  return thisAmount
+}
+
+function playFor(aPerformance) {
+  return plays[aPerformance.playID]
 }
