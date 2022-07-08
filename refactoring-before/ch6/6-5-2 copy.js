@@ -1,17 +1,19 @@
 export default class Book {
-  #reservations;
+  #reservations
   constructor() {
-    this.#reservations = [];
+    this.#reservations = []
   }
 
-// 빠른 예약을 하고 진행하고 싶은경우 true를 전달
+  // 기존의 사용자가 예약을 할 때는 더 빠르게 하고 싶다면은
+  // isPriority를 true로 설정하고 isPriority가 true일 경우
+  // 더 빠르게 예약
   addReservation(customer, isPriority = false) {
-    this.#reservations.push(customer);
+    this.#reservations.push(customer)
   }
 
   hasReservation(customer) {
     return this.#reservations.some(
-      (reservedCustomer) => reservedCustomer.id === customer.id
-    );
+      reservedCustomer => reservedCustomer.id === customer.id
+    )
   }
 }
